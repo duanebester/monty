@@ -1,11 +1,11 @@
-(defproject cloj "0.1.0-SNAPSHOT"
-  :description "Web Application Made In Clojure"
+(defproject monty "0.1.0-SNAPSHOT"
+  :description "Monitor and report system activity"
   :url "http://duanebester.com"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.5.1"]
         				 [com.taoensso/carmine "2.2.0"]             ;; Redis
-        				 [http-kit "2.1.10"]                        ;; Super Fast Http
+        				 [http-kit "2.1.12"]                        ;; Super Fast Http
         				 [compojure "1.1.5"]                        ;; Compojure for Routing
         				 [hiccup "1.0.4"]                           ;; Html from Clojure
         				 [garden "0.1.0-beta6"]                     ;; CSS from Clojure
@@ -26,25 +26,25 @@
   
   ;; Three builds - dev, production, pre-production
   :cljsbuild {
-              :builds [{:source-paths ["src/cloj/templating/cljs"]
-              :compiler {:output-to "resources/js/main.js"
+              :builds [{:source-paths ["src/monty/templating/cljs"]
+              :compiler {:output-to "resources/public/js/main.js"
                          :optimizations :whitespace
                          :pretty-print true}}]
               ; :builds
               ; {:dev
-              ;  {:source-paths ["src/cloj/js/script"]
+              ;  {:source-paths ["src/monty/js/script"]
               ;   :compiler {:output-to "static/js/main_dev.js"
               ;              :optimizations :whitespace
               ;              :pretty-print true}}
                
               ;  :prod
-              ;  {:source-paths ["src/cloj/js/script"]
+              ;  {:source-paths ["src/monty/js/script"]
               ;   :compiler {:output-to "static/js/main.js"
               ;              :pretty-print false
               ;              :optimizations :advanced}}
                
               ;  :pre-prod
-              ;  {:source-paths ["src/cloj/js/script"]
+              ;  {:source-paths ["src/monty/js/script"]
                 
               ;   :compiler {:output-to "static/js/main_pre.js"
               ;              :optimizations :simple
@@ -56,4 +56,4 @@
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/repositories/snapshots/"}
 
   ;; Main function is in cloj.core namespace
-  :main cloj.core)
+  :main monty.core)
