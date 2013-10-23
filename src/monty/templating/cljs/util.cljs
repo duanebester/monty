@@ -1,4 +1,4 @@
-(ns monty.templating.js.util
+(ns monty.templating.cljs.util
 (:require [goog.dom :as gdom]))
 
 (defn length [nodes] (. nodes -length))

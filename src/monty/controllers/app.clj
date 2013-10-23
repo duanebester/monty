@@ -1,29 +1,80 @@
 (ns monty.controllers.app
   (:require [monty.database.redis :as redis]
-            [monty.templating.html.layout :as layout])
+            [clojurewerkz.quartzite.jobs :refer [defjob]]
+            [monty.templating.html.layout :as layout]
+            [clojure.edn :as edn]
+            [monty.controllers.channels])
+  (:import (monty.controllers.channels MemoryChannelStore))
   (:use [org.httpkit.server]
         [monty.templating.json.response :only [jsonRes]]
         [clojure.tools.logging :only (info error)]
         [hiccup.core]
-        [clojure.pprint :only (pprint)]))
+        [clojure.pprint :only (pprint)]
+        [monty.controllers.service :only (start-service stop-service get-sysinfo-map)]))
+
+
+(defonce channel-store (MemoryChannelStore. (atom {})))
+
+(defn broadcastWS
+  [msg]
+  (.broadcast channel-store "sysinfo"
+            (fn [ch since_ts] ; dont do anything, this fn just returns msg
+              {:data "message"})))
 
 (defn- now [] (quot (System/currentTimeMillis) 1000))
 
-(def channels (atom []))
+(defn ^{:doc "Handles WebSocket Channels"}
+  async-handler [req]
+  (let [group (-> req :params :group)
+        since_ts (-> req :params :since_ts)] ;; state variable, from client
+    (with-channel req ch
+      (.add-to-group channel-store group ch since_ts)
+      (on-close ch (fn [status]
+                     (.remove-from-group channel-store group ch))))))
 
+;; Testing, sends dummy data back
 (defn poll-mesg [req]
   (info "/api")
   (jsonRes {:test "value"}))
 
-(defn show-landing-page [req]
+;; We start our get-sysinfo service
+
+(defjob sendSysInfo
+  [ctx]
+  (broadcastWS get-sysinfo-map))
+;; jk = "jobs.sysinfo.1"
+;; tk = "triggers.1"
+(defn start [req]
+  (info "/start")
+  (start-service "jobs.sysinfo.1" "triggers.1" sendSysInfo)
+  (jsonRes {:message "success"}))
+
+;; We stop our get-sysinfo service
+(defn stop [req]
+  (info "/stop")
+  (stop-service "triggers.1")
+  (jsonRes {:message "success"}))
+
+
+
+(defn ^{:doc "Monty Home Page"}
+  home [req]
   (info "/")
-  #_(redis/set "foo" "bar")
-  #_(println (redis/get "foo"))
   (layout/base [:ul {:id "foo" :class "bar"}
                     (for [x (range 1 4)]
                     [:li x])]
+                [:button {:id "ping"} "Ping"]
+                [:button {:id "websocket"} "Socket"]))
+
+(defn ^{:doc "Monty Settings Page"}
+  settings 
+  [req]
+  (info "/settings")
+  (layout/settings [:ul {:id "foo" :class "bar"}
+                    (for [x (range 1 4)]
+                    [:li x])]
                 [:input {:id "terminal" :type "text" :class "topcoat-text-input--large"}]
-                [:button {:id "ping" :class "topcoat-button--large--cta"} "Ping"]
+                [:button {:id "start" :class "topcoat-button--large--cta"} "Start"]
                 [:button {:id "websocket":class "topcoat-button--large--cta"} "Socket"]))
 
 
@@ -32,26 +83,3 @@
         password (-> req :params :password)] ; form param
     ....
     ))
-
-(defn chat-handler [req]
-  (with-channel req channel              ; get the channel
-    ;; communicate with client using method defined above
-    (on-close channel (fn [status]
-                        (println "channel closed")))
-    (if (websocket? channel)
-      (println "WebSocket channel")
-      (println "HTTP channel"))
-    (on-receive channel (fn [data]       ; data received from client
-           ;; An optional param can pass to send!: close-after-send?
-           ;; When unspecified, `close-after-send?` defaults to true for HTTP channels
-           ;; and false for WebSocket.  (send! channel data close-after-send?)
-                          (send! channel data))))) ; data is sent directly to the client
-
-(defn async-handler [request]
-  (with-channel request channel
-    (info "/async")
-    (on-close channel (fn [status] (println "channel closed: " status)))
-    (on-receive channel (fn [data] ;; echo it back
-                          (send! channel data)
-                          (info "Sent WebSocket Data.")))))
-

@@ -1,10 +1,11 @@
 Monty
 ----
-I wrote (combined a bunch of many people's efforts) this mini web app server to provide a basic template for future  projects that might need to communicate over http. Based on [http-kit](http-kit.org), a super fast, lightweight async webserver. Cloj has ClojureScript WebSockets and Ajax, and functionality to talk to a Redis database. The html templating and css are all written in Clojure. 
+A lightweight monitoring app based on [Cloj](https://github.com/duanebester/cloj).
 
 #### Next Steps
-* Implementing Friend or Sandbar and having User authentication.
-* Communicating to MySql database - Might as well - maybe to save User info.
+* Create an alert threshold for disk space
+* Have custom get/post requests for certain thresholds
+* Wire up MySql and Postgres for monitoring database specifics
 
 
 #### Up and Running

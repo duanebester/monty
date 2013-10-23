@@ -6,4 +6,10 @@
 
 (defn start-server [port]
 	(run-server (site #'routes/all-routes) {:port 1337})
-	(println "Server started on port 1337"))
+	(println "                          ")
+	(println " ,-.-.          |         ")
+	(println " | | |,---.,---.|--- ,   .")
+	(println " | | ||   ||   ||    |   |")
+	(println " ` ' '`---'`   '`---'`---|")
+	(println "   @localhost:1337   `---'")
+	(println "                          "))

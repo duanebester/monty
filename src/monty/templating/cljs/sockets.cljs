@@ -2,7 +2,7 @@
 (:require
    [cljs.core.async :refer [chan <! >! put!]]
    [cljs.reader :as reader]
-   [monty.templating.js.util :refer [log]]
+   [monty.templating.cljs.util :refer [log]]
    [dommy.utils :as utils]
    [dommy.core :as dommy])
 (:use-macros
@@ -14,7 +14,7 @@
 (def receive (chan))
 (def alert-view (chan))
 
-(def ws-url "ws://localhost:1337/async")
+(def ws-url "ws://localhost:1337/async/sysinfo")
 (def ws (new js/WebSocket ws-url))
 
 ;; Lifted almost completely from dnolen: 
@@ -31,7 +31,7 @@
   (go
    (while true
      (let [evt  (<! send)]
-         (.send ws (clj->js {:msg "test" :name "duane"}))))))
+         (.send ws {:msg "test" :name "duane"})))))
 
 (defn make-sender []
   (event-chan send (sel1 :#websocket) :click)
@@ -78,4 +78,4 @@
   (make-receiver))
 
 (defn ^:export init []
-	(set! (.-onload js/window) init!))
+  (set! (.-onload js/window) init!))

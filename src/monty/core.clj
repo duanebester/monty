@@ -1,9 +1,9 @@
 (ns monty.core
-  (:require [monty.http.server :as cs])
+  (:require [monty.http.server :as ms])
   (:gen-class))
 
 
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Start Monty Server"
   [& args]
-  (cs/start-server 1337))
+  (ms/start-server 1337))
