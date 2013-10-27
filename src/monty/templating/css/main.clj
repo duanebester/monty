@@ -32,7 +32,7 @@
 (def center-text {:text-align "center"})
  
 ;; Define our "fixed" grid CSS.
-(def monty
+(def fixed
   ;; Create a standard grid and bind the key values.
 
     (styles
@@ -50,6 +50,11 @@
        :margin 0
        :font-weight 200}
       clearfix]
+
+     [:#foo
+      {:min-height (px 500)
+       :max-height (px 500)
+       :overflow-y "auto"}]
  
      (headings
       {:font-weight 200})
@@ -69,10 +74,9 @@
  
      (main
       {:margin [(px 20) "auto"]
-       :min-height (px 500)
-       :max-height (px 500)
        :float "none"
-       :padding (px 40)})
+       :padding (px 40)
+       :text-align "left"})
  
      (sidebar
       center-text

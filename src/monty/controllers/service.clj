@@ -3,29 +3,26 @@
 (:import
 [java.lang Runtime System]
 [java.io File])
-(:require 
-	      [clojurewerkz.quartzite.scheduler :as qs]
+(:require [sigmund.core :as sig]
+	        [clojurewerkz.quartzite.scheduler :as qs]
           [clojurewerkz.quartzite.triggers :as trigger]
           [clojurewerkz.quartzite.jobs :as job]
           [clojurewerkz.quartzite.jobs :refer [defjob]]
           [clojurewerkz.quartzite.schedule.cron :refer [schedule cron-schedule]])
 (:use [clojure.tools.logging :only (info error)]))
 
-(defn ^{:doc "get-sysinfo-map will return important system properties"}
-  get-sysinfo-map
-  []
+(def get-sysinfo-map
   (merge
-  {"Processor-Count" (.availableProcessors (Runtime/getRuntime)),
-   "OS-Name"         (System/getProperty "os.name"),
-   "OS-Arch"         (System/getProperty "os.arch"),
-   "User-Name"       (System/getProperty "user.name"),
-   "User-Home"       (System/getProperty "user.home"),
-   "Java-Version"    (System/getProperty "java.version")}
-   ;; Disk Space:
-  (apply #(hash-map (str "Free-Space-(GB)_" (.getAbsolutePath %))
+  {"processorCount" (.availableProcessors (Runtime/getRuntime)),
+   "osName"         (System/getProperty "os.name"),
+   "osArch"         (System/getProperty "os.arch"),
+   "username"       (System/getProperty "user.name"),
+   "userhome"       (System/getProperty "user.home"),
+   "javaVersion"    (System/getProperty "java.version")}
+  (apply #(hash-map (str "freeSpace_" (.getAbsolutePath %))
                     ;; (1024 * 1024) = MB, (1024 * 1024 * 1024) = GB
                     (float (/ (.getFreeSpace %) (* 1024 1024 1024))))
-  (File/listRoots))))
+  (java.io.File/listRoots))))
 
 #_(defjob sendSysInfo
   [ctx]

@@ -1,6 +1,5 @@
 (ns monty.templating.cljs.sockets
-(:require
-   [cljs.core.async :refer [chan <! >! put!]]
+(:require [cljs.core.async :refer [chan <! >! put!]]
    [cljs.reader :as reader]
    [monty.templating.cljs.util :refer [log]]
    [dommy.utils :as utils]
@@ -17,21 +16,13 @@
 (def ws-url "ws://localhost:1337/async/sysinfo")
 (def ws (new js/WebSocket ws-url))
 
-;; Lifted almost completely from dnolen: 
-;;  https://github.com/swannodette/async-tests/blob/master/src/async_test/utils/helpers.cljs#L103
+
 (defn event-chan
   [c el type]
   (let [writer #(put! c %)]
     (dommy/listen! el type writer)
     {:chan c
      :unsubscribe #(dommy/unlisten! el type writer)}))
-
-#_(defn make-sender []
-  (event-chan send (sel1 :#websocket) :click)
-  (go
-   (while true
-     (let [evt  (<! send)]
-         (.send ws {:msg "test" :name "duane"})))))
 
 (defn make-sender []
   (event-chan send (sel1 :#websocket) :click)
@@ -41,7 +32,7 @@
            name "Duane"
            msg  "Message"]
        (when (= (.-type evt) "click")
-         (log (str (JSON/stringify (clj->js {:msg msg :name name})) "\n"))
+         (log (str "Sent WebSocket Message to Server.") "\n")
          (.send ws {:msg msg :name name}))))))
 
 
@@ -54,28 +45,22 @@
      (let [msg            (<! receive)
            raw-data       (.-data msg)
            data           (reader/read-string raw-data)]
-       (dommy/append! (sel1 :#foo) [:li (str data)])
-       (log "Top: " (.-scrollTop (sel1 :#foo)))
-       (log "Height: " (.-scrollHeight (sel1 :#foo)))
+       (.alert js/window (str data))
+       (dommy/append! (sel1 :#foo) [:li (str (:message data))])
        (set! (.-scrollTop (sel1 :#foo)) (.-scrollHeight (sel1 :#foo)))
-       ))))
-
-#_(defn highlight-new-message []
-  (go
-   (while true
-     (let [alert-msg (<! alert-view)]
-       (js/setTimeout
-        #(dom/remove-class! alert-msg "new")
-        200)))))
+       (dommy/set-html! (sel1 :#username) (str (:username data)))
+       (dommy/set-html! (sel1 :#userhome) (str (:userhome data)))
+       (dommy/set-html! (sel1 :#javaVersion) (str (:javaVersion data)))
+       (dommy/set-html! (sel1 :#osName) (str (:osName data)))))))
 
 (defn make-receiver []
   (set! (.-onmessage ws) (fn [msg] (put! receive msg)))
-  (add-message)
-  #_(highlight-new-message))
+  (add-message))
 
-(defn init! []
+(defn socket-init []
   (make-sender)
-  (make-receiver))
+  (make-receiver)
+  (log "Socket Init"))
 
 (defn ^:export init []
-  (set! (.-onload js/window) init!))
+  (set! (.-onload js/window) socket-init))

@@ -11,7 +11,7 @@
   #_(GET "/ws" [] app/chat-handler)     ;; websocket
   (GET "/api" [] app/poll-mesg)       ;; websocket
   (GET "/async/:group" [] app/async-handler) ;; asynchronous(long polling)
-  (GET "/settings" [] app/settings)
+  #_(GET "/settings" [] app/settings)
   (GET "/start" [] app/start)
   (GET "/stop" [] app/stop)
   #_(context "/async" []
@@ -19,6 +19,6 @@
   ;;(context "/user/:id" []
    ;;        (GET / [] get-user-by-id)
    ;;        (POST / [] update-userinfo))
-  (resources "/js/" {:root "js"})
-  #_(resources "/") ;; static file url prefix /static, in `public` folder
+  #_(resources "/js/" {:root "js"})
+  (resources "/") ;; static file url prefix /static, in `public` folder
   (not-found "<p>Page not found. Return <a href=\"/\">Home</a></p>")) ;; all other, return 404

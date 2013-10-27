@@ -7,13 +7,13 @@
 (defprotocol ChannelStore
   (add-to-group [store group ch attach])
   (remove-from-group [store group ch])
-  (broadcast [store group fn]))
+  (broadcast [store group {}]))
 
 ;; Implementation using atom.
 (deftype MemoryChannelStore [store-map]
   ChannelStore
   (add-to-group [_ group ch attach]
-    (info "Channel: " (str ch) " group: " (str group))
+    #_(send! ch (pr-str {:message "Success"}))
     (swap! store-map (fn [old-store]
                        (assoc old-store
                          group
@@ -25,17 +25,12 @@
                          (if (empty? (m group))
                            (dissoc m group)
                            m)))))
-  (broadcast [store group f]
+  (broadcast [store group dmap]
     (doseq [[ch attach] (@store-map group)]
       (if (websocket? ch)
-        ;; give back attachment (some state for pass back)
-        (info "Sending message to Channel: " (str ch))
-        #_(send! ch (jsonRes {:name "Duane"}))
-        (send! ch {:status 200
-                   :headers {"Content-Type"
-                             "application/json; charset=utf-8"}
-                   :body (write-str (f ch attach))}
-               false)))))                ; close it
+        (do
+        (info (class dmap))
+        (send! ch (pr-str dmap) false)))))) ; close it
 
 ;; Example usage
 #_(defonce channel-store (MemoryChannelStore. (atom {})))

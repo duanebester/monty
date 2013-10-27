@@ -10,6 +10,12 @@
 (:require-macros
    [cljs.core.async.macros :refer [go]]))
 
+(defn toggle-atr!
+  [elem k]
+    (if (boolean (dommy/attr elem k))
+     (dommy/set-attr! elem k)
+     (dommy/remove-attr! elem k)))
+
 (defn receive [event]
   (let [resp (js->clj event)]
     (log "ping")
@@ -23,11 +29,31 @@
  (GET "/api" {:handler receive :error-handler error-handler})
  (.preventDefault e))
 
+(defn start-server [e]
+ (GET "/start" {:handler receive :error-handler error-handler})
+ (.preventDefault e))
+
+(defn stop-server [e]
+ (GET "/stop" {:handler receive :error-handler error-handler})
+ (.preventDefault e))
+
 (defn myalert [e]
   (.alert js/window (str "Hello!"))
   (log "something happened")
   (.preventDefault e))
+
+;; it marks selected list item as selected
+(defn toggle-start [ev]
+  (if (boolean (dommy/attr (.-currentTarget ev) :checked))
+    (do
+      (dommy/remove-attr! (.-currentTarget ev) :checked)
+      (GET "/stop" {:handler receive :error-handler error-handler}))
+    (do
+      (dommy/set-attr! (.-currentTarget ev) :checked)
+      (GET "/start" {:handler receive :error-handler error-handler}))))
  
 (defn ^:export init []
-  #_(set! (.-onclick (sel1 :#ping)) myalert)
+  (dommy/listen! (sel1 :#start) :click toggle-start)
+  #_(set! (.-onclick (sel1 :#stop)) stop-server)
   (set! (.-onclick (sel1 :#ping)) ping-server))
+
