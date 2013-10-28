@@ -20,6 +20,7 @@
       [:div.center
        [:section#main [:h2 "Server Ping"] content]
        #_(sidebar [:h2 "Sidebar"])]
+      [:script {:type "text/javascript" :src "/js/foundation.min.js"}]
       [:script {:type "text/javascript" :src "/js/main.js"}]
       [:script {:type "text/javascript"} "monty.templating.cljs.script.init();"]
       [:script {:type "text/javascript"} "monty.templating.cljs.sockets.init();"]]))
