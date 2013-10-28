@@ -14,8 +14,7 @@
                  [org.clojure/core.async "0.1.242.0-44b1e3-alpha"]
                  [org.clojure/data.json "0.2.3"]
                  [org.clojure/tools.logging "0.2.6"]        ;; Logging
-                 [clj-ssh "0.5.6"]                          ;; SSH
-                 ;;[clj-logging-config "1.9.10"]              ;; Use this to set up logging formatting
+                 ;;[clj-ssh "0.5.6"]                          ;; SSH
                  [cljs-ajax "0.2.1"]
                  [prismatic/dommy "0.1.1"]
                  [org.clojure/clojurescript "0.0-1934"]
